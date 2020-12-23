@@ -1,7 +1,19 @@
 
-import { UnwrapNestedRefs} from '../../types'
+import { UnwrapNestedRefs, Target} from '../../types'
 
 const proxyMap = new WeakMap<Target, any>()
+
+const handlers = {
+    get(target: object, key: string, value, receiver){
+
+    },
+    set(target: object, key: string, value, receiver): boolean{
+        return true
+    },
+    deleteProperty(){
+
+    }
+}
 
 /**
  * ```js
@@ -17,10 +29,9 @@ const proxyMap = new WeakMap<Target, any>()
  */
 export function reactive<T extends object>(target: T): UnwrapNestedRefs<T>
 export function reactive(target: object) {
-    return createReactiveObject(
-        target,
-        false,
-        mutableHandlers,
-        mutableCollectionHandlers
-    )
+    const proxy = new Proxy(target, handlers)
+
+    proxyMap.set(target, proxy)
+
+    return proxy
 }
